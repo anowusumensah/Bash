@@ -10,7 +10,7 @@ argumentChecker() {
 	local n=$1
 	#echo "The number of arguments = $n"
 	 if [ $n -ge 2 ] && [ $n -le 3 ]; then
-            #number of inputs is either or 3
+            #number of inputs should either be 2 or 3
 	    #do nothing, I am yet to find the pass statement in bash
 		n=$n; 
 	else
