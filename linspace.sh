@@ -5,6 +5,8 @@
 # $2 = End point
 # $3 = length of the vector
 # All parameters should be integers
+# eg. ./linspace 10 5
+#eg. ./linspace  5 50 25
 
 argumentChecker() {
 	local n=$1
