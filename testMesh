@@ -1,0 +1,112 @@
+#!/bin/bash
+
+DEBUG=0;
+MESH="newMesh";
+: '
+	   Author = Anthony Owusu-Mensah
+	   Date = February 28/2023
+	   This bash script generates a mesh rectangular mesh using 
+	   a meshing tool called mesher with dimension 0.5cm x 0.5cm x 0.1cm 
+	   and defines 2 regions with tags 30 and 40 respectively.
+	   fibre orientation in the epicardial direction is +60
+	   fibre orientation in the endocardial direction is 0
+	   "perturb" is a factor to "jitter" the locations of the
+	   points internal to the grid, I do not know exactly how to
+	   interpret the quantity 0.5. This helps make the wavefront
+	   propagation look more "natural" because it avoids artefacts
+	   produced by jagged elements in a completely regular grid.
+	   We can remove this if need be.
+	   
+ '
+
+if [[ $DEBUG == "1" ]] || [[ ! -d ${MESH} ]]; then
+	mkdir "${MESH}" && cd "${MESH}" || exit;
+	
+	# Resolution in um
+	res=100;
+	#Mesh dimenstions(cm)
+	x=0.5; y=0.5; z=0.1;
+
+	#Center of mesh 
+	#c=(0 0 0); #default
+	xc=$(echo "scale=2;$x/2" | bc -l);
+	yc=$(echo "scale=2;$y/2" | bc -l);
+	zc=$(echo "scale=2;$z/2" | bc -l);
+	c=("$xc" "$yc" "$zc"); #Centre of mesh
+	#define blocks relative to the center
+	#---------------------------------------------------
+
+	# region 1
+	tag1=30;
+	#'-regdef[0].p0' '{ 3 x Float }' 
+	x0=$(echo "scale=2;0-${c[0]}" | bc -l); 
+	y0=$(echo "scale=2;0-${c[1]}" | bc -l);   
+	z0=$(echo "scale=2;0-${c[2]}" | bc -l);
+	
+	: '
+	echo "-regdef[0].po[0]= $x0";
+	echo "-regdef[0].po[1]= $y0";
+	echo "-regdef[0].po[2]= $z0";
+	 '
+	#'-regdef[0].p1' '{ 3 x Float }'
+	xd=$(echo "scale=2;$x-${c[0]}" | bc -l); 
+	yd=$(echo "scale=2;$y-${c[1]}" | bc -l); 
+	newZd=$(echo "scale=2;$z * 0.90" | bc -l);
+	zd=$(echo "scale=2;$newZd-${c[2]}" | bc -l);
+	
+	: '
+	echo "-regdef[0].p1[0]= $xd";
+	echo "-regdef[0].p1[1]= $yd";
+	echo "-regdef[0].p1[2]= $zd";
+	echo ""
+	echo ""
+	 '
+	# region 2
+	tag2=40;
+	#'-regdef[1].p0' '{ 3 x Float }'
+	x1=$(echo "scale=2;0-${c[0]}" | bc -l);
+	y1=$(echo "scale=2;0-${c[1]}" | bc -l); 
+	z1=$(echo "scale=2;$newZd-${c[2]}" | bc -l);
+	
+	: '
+	echo "-regdef[1].po[0]= $x1";
+	echo "-regdef[1].po[1]= $y1";
+	echo "-regdef[1].po[2]= $z1";
+	 '	
+	
+	#'-regdef[1].p1' '{ 3 x Float }'
+	xd1=$(echo "scale=2;$x-${c[0]}" | bc -l); 
+	yd1=$(echo "scale=2;$y-${c[1]}" | bc -l);
+	zd1=$(echo "scale=2;$z-${c[2]}" | bc -l);
+	
+	: '
+	echo "-regdef[1].p1[0]= $xd1";
+	echo "-regdef[1].p1[1]= $yd1";
+	echo "-regdef[1].p1[2]= $zd1";
+	 '
+
+	# Section that runs mesh
+	echo "Generating Mesh"
+	$(which mesher) \
+	'-size' "{$x $y $z}" \
+	'-resolution' "{$res $res $res}" \
+	'-center' "{${c[0]} ${c[1]} ${c[2]}}" \
+	'-fibers.rotEpi' "60" \
+	'-fibers.rotEndo' "0" \
+	'-numRegions' "2" \
+	'-regdef[0].tag' "$tag1" \
+	'-regdef[0].type' "0" \
+	'-regdef[0].p0' "{$x0 $y0 $z0}" \
+	'-regdef[0].p1' "{$xd $yd $zd}" \
+	'-regdef[1].tag' "$tag2" \
+	'-regdef[1].type' "0" \
+	'-regdef[1].p0' "{$x1 $y1 $z1}" \
+	'-regdef[1].p1' "{$xd1 $yd1 $zd1}" \
+	'-perturb' "0.5" \
+	'-mesh' "${MESH}"; 
+else
+	echo "set DEBUG variable to 1 or folder exist"	
+fi
+
+
+
