@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# This file is used for submmiting jobs to ODU wahab cluster
+# It lists all files with .sh extension and submit to the cluster
 # List all files with with .sh extensions;
 files=($(ls *.sh | sort -u))
 if [[ "${#files[@]}" -ne 0 ]]; then
