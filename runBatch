@@ -51,6 +51,5 @@ for Rpmj in {10..25..5}; do
 	done
 done
 
-	# Once you have all .sh files have been created.
-	# Submit all jobs
+	# Once you have all .sh files created, submit all jobs
 	/scratch/aowus003/Cardiac_Simulations/TestSim/shellScripts/general_sub		
