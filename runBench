@@ -1,0 +1,59 @@
+#!/bin/bash
+
+module load container_env carpentry/2022.11.07
+
+loc="/scratch/aowus003/Cardiac_Simulations/TestSim"
+fileName=("ARPF" "UCLA_RAB");
+IKr=("IKrblk" "baseline")
+dur=10000;
+c=1;
+for i in {0..1}; do
+	
+	for bcl in {500..2000..500}; do
+		num=$(echo "scale=0;(($dur +$bcl-1)/$bcl)" | bc); 
+		
+		# Check ARPF Folder
+		if [[ ! -d "${loc}/${fileName[0]}" ]]; then
+			mkdir "${loc}/${fileName[0]}" && cd "${loc}/${fileName[0]}";
+		else
+			cd "${loc}/${fileName[0]}";
+		fi
+
+		# Run ARPF
+		if [[ ! -e "ARPF_${IKr[$i]}_${bcl}.sv" ]]; then
+ 
+			# ARPF
+			srun crun bench.pt \
+			--imp="ARPF" --bcl="${bcl}" --duration="${dur}"  --numstim="${num}" \
+			--imp-par="g_Kr*$i" --fout="ARPF_${IKr[$i]}_${bcl}" --save-ini-time="${dur}" \
+			--trace-no="${c}" --save-ini-file="ARPF_${IKr[$i]}_${bcl}.sv"
+		else
+			echo "Didn't execute --imp=ARPF, --bcl=${bcl}, --imp-par=g_Kr*${i}"
+		fi
+
+		# Check UCLA_RAB Folder
+		if [[ ! -d "${loc}/${fileName[1]}" ]]; then
+	                mkdir "${loc}/${fileName[1]}" && cd "${loc}/${fileName[1]}";
+	        else
+	                cd "${loc}/${fileName[1]}";
+	        fi
+		
+		# Run UCLA_RAB	
+		if [[ ! -e "UCLA_RAB_${IKr[$i]}_${bcl}.sv" ]]; then 
+			# UCLA_RAB
+			srun crun bench.pt \
+		        --imp="UCLA_RAB" --bcl="${bcl}" --duration="${dur}" --numstim="${num}" \
+		        --imp-par="gKr*$i" --fout="UCLA_RAB_${IKr[$i]}_${bcl}" --save-ini-time="${dur}" \
+		        --trace-no="${c}" --save-ini-file="UCLA_RAB_${IKr[$i]}_${bcl}.sv"
+		else
+			echo "Didn't execute --imp=UCLA_RAB, --bcl=${bcl}, --imp-par=g_Kr*${i}"
+
+		fi
+
+		c=$(("${c}" + 1)) 
+	done
+	
+done	
+
+
+

@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Job submission script Format
+s=('#!/bin/bash' \
+'#SBATCH -n 40' \
+'#SBATCH --job-name=' \
+'#SBATCH --output=' \
+'#SBATCH --mail-type=ALL' \
+'#SBATCH --mail-user=carp.simulation@gmail.com')
+
+parFile="bcl_500_Rpmj_10_Npmj_10.par" # Primary parameter file
+for Rpmj in {10..25..5}; do
+	for Npmj in {10..30..10}; do
+		for prad in 300 400 500; do
+			# create a job submission script
+			# Only create job submission script if doesn't exists
+			file="500-bcl-$Rpmj-Rpmj-$Npmj-Npmj-$prad-PMJsize.sh";
+			noSh=$(echo "${file}" | cut -d '.' -f 1); # Remove .sh from filename
+			if [[ ! -e "${file}" ]]; then
+				echo "${s[0]}" >> "${file}"
+				echo "${s[1]}" >> "${file}"
+				echo "${s[2]}${noSh} "  >> "${file}"
+				echo "${s[3]}${noSh}.out "  >>"${file}"
+	 			echo "${s[4]}" >>"${file}"
+				echo "${s[5]}" >> "${file}"
+
+				# Add carpentry instructions
+				echo "" >> "${file}"
+				echo "" >> "${file}"
+				echo "module load container_env carpentry/2022.11.07" \
+				>>"${file}"
+				echo "" >> "${file}" 
+				cmd="srun crun carp.pt +F ${parFile}"
+				cmd+=" -simID ${noSh}"
+				cmd+=" -vofile ${noSh}" 
+				cmd+=" -phie_recovery_file ${noSh}_ECG"
+				cmd+=" -nPMJ_min ${Npmj}" 
+				cmd+=" -nPMJ_max ${Npmj}"
+				cmd+=" -Rpmj ${Rpmj}" 
+				cmd+=" -PMJsize ${prad}"
+
+				# Write carp command to  jobfile
+				echo "${cmd}" >> "${file}"
+				else
+					echo "I didn't run ${file} "
+			fi
+		done
+	done
+done
+
+	# Once you have all .sh files have been created.
+	# Submit all jobs
+	/scratch/aowus003/Cardiac_Simulations/TestSim/shellScripts/general_sub		

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+ 	#Testing
+	: '
+	module load intel intel-mpi        
+         srun /home/mdeo/carp-tools-1.8.0-Linux/bin/bench \
+        --imp="UCLA_RAB" --bcl=1000 --duration 10000 --numstim=10 \
+        --imp-par="gKr*0" --fout=UCLA_start \
+        --read-ini-file="/scratch/aowus003/Cardiac_Simulations/TestSim/stateFiles/UCLA_RAB_GKr_blk.sv" 
+
+	 '
+
+
+fileName="ARPF";
+if [[ -d "${fileName}" ]]; then
+	echo "Bench script didn't execute"
+	exit;
+else
+	mkdir "${fileName}" && cd "${fileName}";
+	module load intel intel-mpi
+
+	#bench command
+	#Purkinje IKr block
+	srun /home/mdeo/carp-tools-1.8.0-Linux/bin/bench \
+	--imp="ARPF" --bcl=1000 --duration 10000 --numstim=10 \
+	--imp-par="g_Kr*0" --fout=ARPF_GKr_blk --save-ini-time=10000 \
+	--trace-no=1 --save-ini-file="ARPF_GKr_blk.sv"
+
+	#Ventricular IKr block
+	srun /home/mdeo/carp-tools-1.8.0-Linux/bin/bench \
+        --imp="UCLA_RAB" --bcl=1000 --duration 10000 --numstim=10 \
+        --imp-par="gKr*0" --fout=UCLA_RAB_GKr_blk --save-ini-time=10000 \
+        --trace-no=2 --save-ini-file="UCLA_RAB_GKr_blk.sv" 
+
+fi
+
+
+

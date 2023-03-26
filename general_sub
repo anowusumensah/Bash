@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# List all files with with .sh extensions;
+files=($(ls *.sh | sort -u))
+if [[ "${#files[@]}" -ne 0 ]]; then
+	for file in "${files[@]}";do
+		sbatch "${file}"
+	done
+else
+	echo "No .sh files are present"
+fi
+
+exit;
+

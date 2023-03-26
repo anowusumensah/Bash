@@ -1,0 +1,90 @@
+
+# ---------------------------------------------------------------------
+start_statef        				= ""
+write_statef         				= ""
+num_tsav                 			= 0 
+simID 		     				= "500_Rpmj_10_Npmj_10"
+vofile               				= "Boyle_Protocol_bcl_500_Rpmj_10_Npmj_10"
+phie_recovery_file   				= "Boyle_Protocol_bcl_500_Rpmj_10_Npmj_10_ECG"
+tend                 				= 800
+# ---------------------------------------------------------------------
+
+meshname       				= "/scratch/aowus003/Cardiac_Simulations/TBC_mesh/TBunnyC"
+
+# Ionic region definitions
+num_external_imp 				= 0
+num_imp_regions 				= 1
+imp_region[0].name   				= "Myocardium"
+imp_region[0].im        			= "UCLA_RAB"
+imp_region[0].im_param  			= ""
+imp_region[0].num_IDs 				= 1
+imp_region[0].ID 				= 100
+imp_region[0].im_sv_init 			= "/scratch/aowus003/Cardiac_Simulations/TestSim/UCLA_RAB/UCLA_RAB_baseline_500.sv"
+imp_region[0].plugins 				= ""
+imp_region[0].plug_param 			= ""
+
+# conductive regions
+num_gregions           				= 2
+###########################################################################################################
+gregion[0].name = "Intracellular-Conductivity"
+gregion[0].num_IDs  				= 1
+gregion[0].ID       				= 100
+gregion[0].g_il     				= 165.3e-3   
+gregion[0].g_it     				= 18.30e-3
+
+###########################################################################################################
+gregion[1].name 				= "Extracellular-Conductivity"
+gregion[1].num_IDs  				= 3
+gregion[1].ID       				= 400 500 600
+gregion[1].g_el     				= 592.8e-3   
+gregion[1].g_et     				= 224.2e-3
+
+# Stimulus definitions 
+num_stim              				= 1
+stimulus[0].stimtype  				= 0
+stimulus[0].strength  				= 50
+stimulus[0].start     				= 0
+stimulus[0].duration  				= 10
+stimulus[0].vtx_file  				= /scratch/aowus003/Cardiac_Simulations/TestSim/vtxFiles/rightVent_4000
+
+# I/O
+timedt               				= 1.0
+spacedt              				= 3.0
+
+# solver
+dt 						= 20
+parab_solve  					= 0
+bidomain     					= 0
+gridout_i    					= 3
+gridout_e    					= 3
+mass_lumping 					= 0
+
+# Activation
+num_LATs 					= 1
+lats[0].measurand 				= 0
+lats[0].mode 					= 0
+lats[0].threshold 				= -10
+lats[0].all 					= 0
+lats[0].method 					= 1
+
+# ECG Points
+phie_rec_ptf 					= "/scratch/aowus003/Cardiac_Simulations/TBC_mesh/TBC_ECG_points"
+phie_rec_meth 					= 2
+
+################################################################################################
+# Purkinje Setup
+purkf 						= /scratch/aowus003/Cardiac_Simulations/TBC_mesh/TBunnyC_smooth_subendo
+numPurkIon 					= 1
+PurkIon[0].im 					= "ARPF"
+PurkIon[0].im_param 				= ""
+PurkIon[0].im_sv_init				= "/scratch/aowus003/Cardiac_Simulations/TestSim/ARPF/ARPF_baseline_500.sv"
+His_period 					= 500
+His_n 						= 0
+His_time 					= 0
+nPMJ_min 					= 10
+nPMJ_max 					= 10
+PMJscale 					= 1000.0
+Rpmj 						= 10e3
+PMJsize 					= 500
+
+
