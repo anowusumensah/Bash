@@ -1,5 +1,8 @@
 #!/bin/bash
-
+# Creation of individual files for sensitivity analysis is error prone
+# You might not make changes to all the required parameters 
+# This automated script runs a couple of simulations for varying values
+# of Rpmj, Npmj and Npmj for TBunnyC rabbit heart
 # Job submission script Format
 s=('#!/bin/bash' \
 '#SBATCH -n 40' \
