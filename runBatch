@@ -47,7 +47,7 @@ for Rpmj in {10..25..5}e3; do
 				# Write carp command to  jobfile
 				echo "${cmd}" >> "${file}"
 			else
-					echo "I didn't run ${file} "
+				echo "I didn't run ${file} "
 			fi
 		done
 	done
