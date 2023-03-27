@@ -13,8 +13,8 @@ s=('#!/bin/bash' \
 '#SBATCH --mail-type=ALL' \
 '#SBATCH --mail-user=carp.simulation@gmail.com')
 
-parFile="bcl_500_Rpmj_10_Npmj_10.par" # Primary parameter file
-for Rpmj in {10..25..5}; do
+parFile="${1:-"bcl_500_Rpmj_10_Npmj_10.par"}" # Primary parameter file
+for Rpmj in {10..25..5}e3; do
 	for Npmj in {10..30..10}; do
 		for prad in 300 400 500; do
 			# create a job submission script
